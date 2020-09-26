@@ -3,7 +3,6 @@ import { withRouter } from "react-router-dom";
 import { withStyles } from '@material-ui/core/styles';
 import {
   Typography,
-  TextField,
   Card,
 } from '@material-ui/core';
 import { colors } from '../../theme'
@@ -14,6 +13,8 @@ import {
   GET_VAULT_BALANCES_FULL,
   VAULT_BALANCES_FULL_RETURNED,
 } from '../../constants'
+
+import Loader from '../loader'
 
 import Store from "../../stores";
 const emitter = Store.emitter
@@ -154,7 +155,7 @@ class APR extends Component {
 
     this.state = {
       assets: store.getStore('vaultAssets'),
-      loading: false
+      loading: true
     }
 
     if(account && account.address) {
@@ -175,7 +176,10 @@ class APR extends Component {
   };
 
   connectionConnected = () => {
-    this.setState({ account: store.getStore('account') })
+    this.setState({
+      account: store.getStore('account'),
+      loading: true
+    })
     dispatcher.dispatch({ type: GET_VAULT_BALANCES_FULL, content: { } })
   };
 
@@ -184,15 +188,15 @@ class APR extends Component {
   }
 
   statisticsReturned = (balances) => {
-    this.setState({ assets: store.getStore('vaultAssets') })
+    this.setState({
+      assets: store.getStore('vaultAssets'),
+      loading: false
+    })
   };
 
   render() {
-    const { classes, t } = this.props;
-    const {
-      loading,
-      assets
-    } = this.state
+    const { classes } = this.props;
+    const { loading } = this.state
 
     return (
       <div className={ classes.root }>
@@ -206,6 +210,7 @@ class APR extends Component {
             </tbody>
           </table>
         </Card>
+        { loading && <Loader /> }
       </div>
     )
   };

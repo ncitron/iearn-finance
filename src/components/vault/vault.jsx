@@ -283,6 +283,10 @@ const styles = theme => ({
     fontSize: '1em',
     marginRight: '6px'
   },
+  removePadding: {
+    padding: '0px',
+    maxWidth: '900px'
+  }
 });
 
 class Vault extends Component {
@@ -303,7 +307,8 @@ class Vault extends Component {
       search: '',
       searchError: false,
       hideZero: localStorage.getItem('yearn.finance-hideZero') === '1' ? true : false,
-      basedOn: basedOn ? parseInt(basedOn) : 1
+      basedOn: basedOn ? parseInt(basedOn) : 1,
+      loading: true
     }
 
     if(account && account.address) {
@@ -342,10 +347,13 @@ class Vault extends Component {
   connectionConnected = () => {
     const { t } = this.props
     const account = store.getStore('account')
+
     this.setState({
+      loading: true,
       account: account,
       address: account.address ? account.address.substring(0,6)+'...'+account.address.substring(account.address.length-4,account.address.length) : null
     })
+
 
     dispatcher.dispatch({ type: GET_VAULT_BALANCES_FULL, content: {} })
 
@@ -484,7 +492,7 @@ class Vault extends Component {
                   <div className={ classes.flexy }>
                     <Typography variant={ 'h3' } noWrap>{ (this._getAPY(asset)/1).toFixed(2) }% </Typography>
                     <Typography variant={ 'h5' } className={ classes.on }> on </Typography>
-                    <Typography variant={ 'h3' } noWrap>{ (asset.vaultBalance ? (Math.floor(asset.vaultBalance*asset.pricePerFullShare*10000)/10000).toFixed(2) : '0.00') } {asset.vaultSymbol}</Typography>
+                    <Typography variant={ 'h3' } noWrap>{ (asset.vaultBalance ? (Math.floor(asset.vaultBalance*asset.pricePerFullShare*10000)/10000).toFixed(2) : '0.00') } {asset.symbol}</Typography>
                   </div>
                 </div>
               }
@@ -510,7 +518,7 @@ class Vault extends Component {
               </div>
             </div>
           </AccordionSummary>
-          <AccordionDetails>
+          <AccordionDetails className={ classes.removePadding }>
             <Asset asset={ asset } startLoading={ this.startLoading } basedOn={ basedOn } />
           </AccordionDetails>
         </Accordion>
